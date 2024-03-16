@@ -1,0 +1,59 @@
+---
+
+# Copyright 2024 Cloudera, Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Disable SELinux
+  ansible.posix.selinux:
+    state: disabled
+  notify: restart host
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Install JDK
+  ansible.builtin.import_role: cloudera.exe.jdk
+#  vars:
+#    state: present  
+
+- name: Install tls certs
+  ansible.builtin.import_role: cloudera.exe.tls.generate_csr
+  when: httpd_setup_enable|bool
+
+- name: Sign CSR
+  ansible.builtin.import_role: cloudera.exe.tls.signing
+  when: httpd_setup_enable|bool
+
+- name: Install Signed Cert
+  ansible.builting.import_role: cloudera.exe.tls.install_certs
+  when: httpd_setup_enable|bool
+
+- name: Install httpd
+  ansible.builtin.package:
+    name: httpd
+    state: present
+  when: httpd_setup_enable|bool
+
+ - name: Start and enable service httpd
+   ansible.builtin.service:
+     name: httpd
+     state: started
+     enabled: yes 
+   when: httpd_setup_enable|bool
+
+- name: Install Nexus registry
+  ansible.builtin.import_role: nexus3-oss
+  vars:
+    nexus_public_hostname: {{ ansible_hostname }}
+
