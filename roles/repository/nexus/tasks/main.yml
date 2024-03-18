@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 - name: Disable SELinux
   ansible.posix.selinux:
     state: disabled
@@ -22,22 +23,24 @@
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers
 
+    
 - name: Install JDK
-  ansible.builtin.import_role: cloudera.exe.jdk
-#  vars:
-#    state: present  
+  ansible.builtin.import_role: 
+    name: cloudera.exe.jdk
 
 - name: Install tls certs
-  ansible.builtin.import_role: cloudera.exe.tls.generate_csr
-  when: httpd_setup_enable|bool
+  ansible.builtin.import_role: 
+    name: cloudera.exe.tls.generate_csr
+  vars:
+    acl_mode: root
 
 - name: Sign CSR
-  ansible.builtin.import_role: cloudera.exe.tls.signing
-  when: httpd_setup_enable|bool
+  ansible.builtin.import_role: 
+    name: cloudera.exe.tls.signing
 
 - name: Install Signed Cert
-  ansible.builting.import_role: cloudera.exe.tls.install_certs
-  when: httpd_setup_enable|bool
+  ansible.builtin.import_role: 
+    name: cloudera.exe.tls.install_certs
 
 - name: Install httpd
   ansible.builtin.package:
@@ -45,15 +48,20 @@
     state: present
   when: httpd_setup_enable|bool
 
- - name: Start and enable service httpd
-   ansible.builtin.service:
-     name: httpd
-     state: started
-     enabled: yes 
-   when: httpd_setup_enable|bool
+- name: Install mod_ssl
+  ansible.builtin.package:
+    name: mod_ssl
+    state: present
+  when: httpd_setup_enable|bool
+
+- name: Start and enable service httpd
+  ansible.builtin.service:
+    name: httpd
+    state: started
+    enabled: yes 
+  when: httpd_setup_enable|bool
 
 - name: Install Nexus registry
-  ansible.builtin.import_role: nexus3-oss
-  vars:
-    nexus_public_hostname: {{ ansible_hostname }}
+  ansible.builtin.import_role: 
+    name: nexus3-oss
 

@@ -20,6 +20,9 @@ roles:
 
   - src: https://github.com/clevesque/ansible-role-mysql
     version: master
+  
+  - src: https://github.com/ansible-ThoTeam/nexus3-oss
+    version: master
 
 collections:
   - name: https://github.com/cloudera-labs/cloudera.cloud.git

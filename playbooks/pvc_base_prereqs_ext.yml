@@ -115,7 +115,7 @@
   hosts: "{{ target | default('cloudera_manager, cluster, tls, krb5_server, ecs_nodes') }}"
   become: yes
   roles:
-    - cloudera.cluster.prereqs.jdk
+    - cloudera.exe.jdk
   tags:
     - jdk
     - security
@@ -215,9 +215,9 @@
   become: yes
   gather_facts: no
   roles:
-    - cloudera.cluster.security.tls_generate_csr
-    - cloudera.cluster.security.tls_signing
-    - cloudera.cluster.security.tls_install_certs
+    - cloudera.exe.tls.generate_csr
+    - cloudera.exe.tls.signing
+    - cloudera.exe.tls.install_certs
   vars:
     local_certs_dir: "{{ local_temp_dir }}/certs"
     local_csrs_dir: "{{ local_temp_dir }}/csrs"
@@ -248,7 +248,7 @@
   become: yes
   gather_facts: no
   roles:
-    - role: cloudera.cluster.security.tls_nifi
+    - role: cloudera.exe.tls.nifi
       when: >
         (tls | default(False)
         or manual_tls_cert_distribution | default(False))

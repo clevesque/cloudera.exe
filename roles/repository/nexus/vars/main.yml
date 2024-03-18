@@ -1,0 +1,13 @@
+---
+
+jdk_version: 8
+nexus_public_hostname: "{{ inventory_hostname }}"
+nexus_admin_password: "{{ common_password }}"
+nexus_purge: false
+httpd_setup_enable: true
+httpd_ssl_certificate_file: "{{ tls_cert_path }}"
+httpd_ssl_certificate_key_file: "{{ tls_key_path_plaintext_generic }}"
+httpd_copy_ssl_files: false
+httpd_ssl_cert_file_location: "{{ tls_cert_path }}"
+httpd_ssl_cert_key_location: "{{ tls_key_path_plaintext_generic }}"
+httpd_ssl_cert_chain_file_location: "{{ tls_chain_path }}"
